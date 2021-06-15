@@ -57,7 +57,6 @@ router.get("/:monsterIndex", async (req, res) => {
       const skillStat = convert[skillName]; // =>  Charisma
 
       return (proficiency = { name: skillName, stat: skillStat });
-      console.log(proficiency);
     });
     monster = { ...response.data, proficiencies: proficiencies };
     console.log(response.data.proficiencies);
