@@ -22,29 +22,38 @@ router.get("/monsters-list/:cr?", async (req, res) => {
 
 router.get("/:monsterIndex", async (req, res) => {
   const convert = {
-    Athletics: "Strength",
+    Athletics: "strength",
+    STR: "strength",
 
-    Acrobatics: "Dexterity",
-    Sleight_of_Hand: "Dexterity",
-    Stealth: "Dexterity",
+    Acrobatics: "dexterity",
+    Sleight_of_Hand: "dexterity",
+    Stealth: "dexterity",
+    DEX: "dexterity",
 
-    Arcana: "Intelligence",
-    History: "Intelligence",
-    Investigation: "Intelligence",
-    Nature: "Intelligence",
-    Religion: "Intelligence",
+    Arcana: "intelligence",
+    History: "intelligence",
+    Investigation: "intelligence",
+    Nature: "intelligence",
+    Religion: "intelligence",
+    INT: "intelligence",
 
-    Animal_Handling: "Wisdom",
-    Insight: "Wisdom",
-    Medicine: "Wisdom",
-    Perception: "Wisdom",
-    Survival: "Wisdom",
+    Animal_Handling: "wisdom",
+    Insight: "wisdom",
+    Medicine: "wisdom",
+    Perception: "wisdom",
+    Survival: "wisdom",
+    WIS: "wisdom",
 
-    Deception: "Charisma",
-    Intimidation: "Charisma",
-    Performance: "Charisma",
-    Persuasion: "Charisma",
+    Deception: "charisma",
+    Intimidation: "charisma",
+    Performance: "charisma",
+    Persuasion: "charisma",
+    CHA: "charisma",
   };
+  function profBonus(cr) {
+    if (cr === 0) return 2;
+    else return 1 + Math.ceil(cr / 4);
+  }
   try {
     // const users = await User.find();
     const response = await axios.get(
@@ -53,13 +62,47 @@ router.get("/:monsterIndex", async (req, res) => {
 
     const proficiencies = response.data.proficiencies.map((proficiency) => {
       //   console.log("RESPONSE FROM SERVER", proficiency);
-      const skillName = proficiency.proficiency.name.split(" ")[1]; // Deception
-      const skillStat = convert[skillName]; // =>  Charisma
 
-      return (proficiency = { name: skillName, stat: skillStat });
+      /**Need to change this
+       * First split and save in an array
+       * check if array[0] === Saving
+       * if not continue with the normal code
+       * if true split by " :"  or maybe take array[2]
+       * add a third property to proficiency called type: ( can be saving throws or skills)
+       * add a fourth property called expertise
+       * create a function to calculate if a skill has expertise
+       */
+
+      const skillName = proficiency.proficiency.name.split(" ")[1]; // skill (Ex: Deception)
+
+      const skillStat = convert[skillName]; // => Stat (Ex: charisma)
+      console.log(skillName, skillStat);
+
+      return (proficiency = {
+        name: skillName,
+        stat: skillStat,
+      });
     });
-    monster = { ...response.data, proficiencies: proficiencies };
-    console.log(response.data.proficiencies);
+
+    //delete passive perception from senses as it's value it's calculated in the frontend
+
+    const { passive_perception, ...newSenses } = response.data.senses;
+
+    // Refactor hit_dice object
+    const hitDie = response.data.hit_dice.split("d")[1];
+    const hitDice = response.data.hit_dice.split("d")[0];
+
+    //
+
+    monster = {
+      ...response.data,
+      proficiencies: proficiencies,
+      senses: newSenses,
+      hit_dice: { type: `d${hitDie}`, amount: hitDice },
+
+      proficiency_bonus: profBonus(response.data.challenge_rating),
+    };
+    // console.log(monster);
     res.send(monster);
   } catch (e) {
     res.send(e.message);
