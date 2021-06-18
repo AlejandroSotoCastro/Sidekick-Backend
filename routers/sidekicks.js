@@ -7,13 +7,45 @@ const router = express.Router();
 // Get list of monsters
 router.get("/monsters-list/:cr?", async (req, res) => {
   try {
+    function myCOOLfunction(CR) {
+      CR = parseFloat(CR); // In case the input is a string
+      /**CASE 0 */
+      if (CR === 0) {
+        return 0;
+      } else if (CR >= 1) {
+        /**CASE INTEGER (>=1) */
+        let lowerCRs = "0, 0.125, 0.25, 0.5";
+
+        for (i = 1; i <= CR; i++) {
+          lowerCRs += `,${i}`;
+        }
+        return lowerCRs;
+      } else {
+        /**CASE DECIMAL (>0|<1) */
+        let aux = CR;
+        let CRsList = "0";
+
+        do {
+          CRsList += `,${aux}`;
+          aux /= 2;
+        } while (aux >= 0.125);
+
+        return CRsList;
+      }
+    }
+
+    const cr = myCOOLfunction(req.params.cr);
+
     // const users = await User.find();
+
     const response = await axios.get(
-      `https://www.dnd5eapi.co/api/monsters?challenge_rating=0,0.125,0.25,0.5`
+      `https://www.dnd5eapi.co/api/monsters?challenge_rating=${cr}`
     );
 
-    const listOfMonsters = response.data.results.map((monster) => monster.name);
-    // console.log("RESPONSE FROM SERVER", response.data);
+    const listOfMonsters = response.data.results.map((monster) => {
+      return { value: monster.index, label: monster.name };
+    });
+
     res.send(listOfMonsters);
   } catch (e) {
     res.send(e.message);
@@ -76,7 +108,7 @@ router.get("/:monsterIndex", async (req, res) => {
       const skillName = proficiency.proficiency.name.split(" ")[1]; // skill (Ex: Deception)
 
       const skillStat = convert[skillName]; // => Stat (Ex: charisma)
-      console.log(skillName, skillStat);
+      //console.log(skillName, skillStat);
 
       return (proficiency = {
         name: skillName,
