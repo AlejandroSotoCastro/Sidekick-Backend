@@ -62,6 +62,8 @@ router.get("/:monsterIndex", async (req, res) => {
     Stealth: "dexterity",
     DEX: "dexterity",
 
+    CON: "constitution",
+
     Arcana: "intelligence",
     History: "intelligence",
     Investigation: "intelligence",
@@ -96,7 +98,7 @@ router.get("/:monsterIndex", async (req, res) => {
       //   console.log("RESPONSE FROM SERVER", proficiency);
 
       /**Need to change this
-       * First split and save in an array
+       * First split and s  ave in an array
        * check if array[0] === Saving
        * if not continue with the normal code
        * if true split by " :"  or maybe take array[2]
@@ -120,18 +122,27 @@ router.get("/:monsterIndex", async (req, res) => {
 
     const { passive_perception, ...newSenses } = response.data.senses;
 
+    //add things that might or might not exist
+
+    const special_abilities = response.data.special_abilities
+      ? [...response.data.special_abilities]
+      : [];
+    const actions = response.data.actions ? [...response.data.actions] : [];
+
     // Refactor hit_dice object
     const hitDie = response.data.hit_dice.split("d")[1];
     const hitDice = response.data.hit_dice.split("d")[0];
-
-    //
 
     monster = {
       ...response.data,
       proficiencies: proficiencies,
       senses: newSenses,
+      special_abilities: special_abilities,
+      actions: actions,
       hit_dice: { type: `d${hitDie}`, amount: hitDice },
-
+      sidekickName: "",
+      cclass: "",
+      level: 1,
       proficiency_bonus: profBonus(response.data.challenge_rating),
     };
     // console.log(monster);
