@@ -1,3 +1,7 @@
+//import { myCOOLfunction } from "../config/helperfunctions";
+
+const myCOOLfunction = require("../config/helperfunctions");
+
 const express = require("express");
 const axios = require("axios");
 
@@ -7,33 +11,6 @@ const router = express.Router();
 // Get list of monsters
 router.get("/monsters-list/:cr?", async (req, res) => {
   try {
-    function myCOOLfunction(CR) {
-      CR = parseFloat(CR); // In case the input is a string
-      /**CASE 0 */
-      if (CR === 0) {
-        return 0;
-      } else if (CR >= 1) {
-        /**CASE INTEGER (>=1) */
-        let lowerCRs = "0, 0.125, 0.25, 0.5";
-
-        for (i = 1; i <= CR; i++) {
-          lowerCRs += `,${i}`;
-        }
-        return lowerCRs;
-      } else {
-        /**CASE DECIMAL (>0|<1) */
-        let aux = CR;
-        let CRsList = "0";
-
-        do {
-          CRsList += `,${aux}`;
-          aux /= 2;
-        } while (aux >= 0.125);
-
-        return CRsList;
-      }
-    }
-
     const cr = myCOOLfunction(req.params.cr);
 
     // const users = await User.find();
