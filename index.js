@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-const dbConfig = require("./config/config.js");
+const dbConfig = require("./config/constants.js");
 
 const authRouter = require("./routers/auth");
 const sideRouter = require("./routers/sidekicks");
