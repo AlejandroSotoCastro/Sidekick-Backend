@@ -1,11 +1,14 @@
 //import { myCOOLfunction } from "../config/helperfunctions";
 
 const myCOOLfunction = require("../config/helperfunctions");
+const authMiddleware = require("../auth/middleware");
 
 const express = require("express");
 const axios = require("axios");
 
-//const User = require("../models/user"); // new
+const Sidekick = require("../models/sidekick");
+const sidekick = require("../models/sidekick");
+
 const router = express.Router();
 
 // Get list of monsters
@@ -126,6 +129,35 @@ router.get("/:monsterIndex", async (req, res) => {
     res.send(monster);
   } catch (e) {
     res.send(e.message);
+  }
+});
+
+router.post("/", authMiddleware, async (req, res) => {
+  try {
+    console.log("req", req.user.id, req.body);
+    const newSidekick = await Sidekick.create({
+      ...req.body,
+      user: req.user.id,
+    });
+
+    return res.status(200).send({
+      message: "Sidekick saved",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+router.get("/", authMiddleware, async (req, res) => {
+  try {
+    const userSidekicks = await Sidekick.find({ user: req.user.id }).populate(
+      "user",
+      "name -_id"
+    );
+
+    res.send(userSidekicks);
+  } catch (error) {
+    console.log(error);
   }
 });
 
