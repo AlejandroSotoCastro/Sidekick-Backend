@@ -87,6 +87,7 @@ router.post("/user", async (req, res) => {
 // - get the users email & name using only their token
 // - checking if a token is (still) valid
 router.get("/me", authMiddleware, async (req, res) => {
+  console.log("testing /me");
   // don't send back the password hash
   delete req.user["password"];
   res.status(200).send({ ...req.user });

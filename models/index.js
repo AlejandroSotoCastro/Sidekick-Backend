@@ -7,6 +7,7 @@ const db = {};
 db.mongoose = mongoose;
 db.url = dbConfig.url;
 db.user = require("./user.js")(mongoose);
+db.sidekick = require("./sidekick.js")(mongoose);
 
 //  db.sidekicks.users.createIndex({ email: 1 }, { unique: true });
 
